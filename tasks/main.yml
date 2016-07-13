@@ -1,0 +1,32 @@
+---
+- name: Install nginx
+  package: name={{item}} state=present
+  with_items:
+  - nginx
+
+# All TLS-enabled templates reference this file
+- name: Create DHE parameter file
+  command: openssl dhparam -out /etc/ssl/dhparam.pem 2048
+  args:
+    creates: /etc/ssl/dhparam.pem
+
+- name: Copy in site configuration if no TLS
+  template: src=nginx_site_config_notls.j2
+            dest=/etc/nginx/sites-available/{{nginx_sitename}}
+  when: not nginx_certchain is defined and nginx_contract_port
+
+- name: Copy in site configuration if TLS
+  template: src=nginx_site_config_tls.j2
+            dest=/etc/nginx/sites-available/{{nginx_sitename}}
+  when: nginx_certchain is defined and nginx_contract_port
+
+- name: Copy in reverse proxy configuration with TLS
+  template: src=nginx_reverse_proxy_tls.j2
+            dest=/etc/nginx/sites-available/{{nginx_sitename}}
+  when: nginx_certchain is defined and nginx_reverse_host is defined
+
+- name: Copy in reverse proxy configuration without TLS
+  template: src=nginx_reverse_proxy_notls.j2
+            dest=/etc/nginx/sites-available/{{nginx_sitename}}
+  when: not nginx_certchain is defined and nginx_reverse_host is defined
+  
