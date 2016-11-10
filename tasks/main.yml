@@ -4,7 +4,7 @@
   with_items:
   - nginx
 
-# All TLS-enabled templates reference this file
+# All TLS-enabled templates need this file
 - name: Create DHE parameter file
   command: openssl dhparam -out /etc/ssl/dhparam.pem 2048
   args:
@@ -13,12 +13,12 @@
 - name: Copy in site configuration if no TLS
   template: src=nginx_site_config_notls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
-  when: not nginx_certchain is defined and nginx_contract_port
+  when: not nginx_certchain is defined and nginx_contract_socket
 
 - name: Copy in site configuration if TLS
   template: src=nginx_site_config_tls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
-  when: nginx_certchain is defined and nginx_contract_port
+  when: nginx_certchain is defined and nginx_contract_socket
 
 - name: Copy in reverse proxy configuration with TLS
   template: src=nginx_reverse_proxy_tls.j2
@@ -29,4 +29,11 @@
   template: src=nginx_reverse_proxy_notls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
   when: not nginx_certchain is defined and nginx_reverse_host is defined
-  
+
+- name: Enable (symlink) nginx configuration
+  file: force=yes state=link
+        path=/etc/nginx/sites-enabled/{{nginx_sitename}}
+        src=/etc/nginx/sites-available/{{nginx_sitename}}
+
+- name: Restart nginx
+  service: name=nginx state=restarted
