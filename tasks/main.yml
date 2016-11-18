@@ -36,4 +36,4 @@
         src=/etc/nginx/sites-available/{{nginx_sitename}}
 
 - name: Restart nginx
-  service: name=nginx state=restarted
+  service: name=nginx state=reloaded
