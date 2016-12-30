@@ -29,11 +29,11 @@ server {
 
         location {{"/" ~ nginx_url_prefix|default("")}}/ {
                 include uwsgi_params;
-		{% if nginx_contract_port is defined %}
+                {% if nginx_contract_port is defined %}
                 uwsgi_pass 127.0.0.1:{{nginx_contract_port}};
-		{% elif nginx_contract_socket is defined %}
-		uwsgi_pass unix://{{nginx_contract_socket}};
-		{% endif %}
+                {% elif nginx_contract_socket is defined %}
+                uwsgi_pass unix://{{nginx_contract_socket}};
+                {% endif %}
         }
 
         # Used for Let's Encrypt certificate (re-)issuance process
