@@ -29,6 +29,8 @@ server {
 
         server_name {{ nginx_virtualhost }};
 
+        client_max_body_size 100m;
+
         # ssl_certificate is supposed to include any chained certs
         ssl_certificate {{ nginx_certchain|default("non_existent")}};
         ssl_certificate_key {{nginx_privkey|default("non_existent")}};
