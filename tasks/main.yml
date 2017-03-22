@@ -13,7 +13,7 @@
 - name: Copy in site configuration if no TLS
   template: src=nginx_site_config_notls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
-  when: nginx_certchain is not defined and nginx_contract_socket
+  when: nginx_certchain is not defined and nginx_contract_socket is defined
 
 - name: Ensure certificate archive exists
   become: yes
@@ -67,7 +67,7 @@
 - name: Copy in site configuration if TLS
   template: src=nginx_site_config_tls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
-  when: nginx_certchain is defined and nginx_contract_socket
+  when: nginx_certchain is defined and nginx_contract_socket is defined
 
 - name: Copy in reverse proxy configuration with TLS
   template: src=nginx_reverse_proxy_tls.j2
