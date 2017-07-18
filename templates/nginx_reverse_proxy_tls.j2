@@ -29,8 +29,6 @@ server {
 
         server_name {{ nginx_virtualhost }};
 
-        client_max_body_size 100m;
-
         # ssl_certificate is supposed to include any chained certs
         ssl_certificate {{ nginx_certchain|default("non_existent")}};
         ssl_certificate_key {{nginx_privkey|default("non_existent")}};
@@ -53,6 +51,10 @@ server {
         # fetch OCSP records from URL in ssl_certificate and cache them
         ssl_stapling on;
         ssl_stapling_verify on;
+        # For some reason nginx does not want to use local resolver libraries
+        # to resolve ocsp urls. We need to use Googles servers thus, because
+        # it would be a PITA to configure this per datacenter
+        resolver 8.8.8.8;
 
         root /usr/share/nginx/html;
         index index.html index.htm;
@@ -67,6 +69,12 @@ server {
         # If the buffer is too small nginx will write the buffer
         # out to file, which is silly.
         proxy_buffers 1024 4k;
+
+        # blocks uploads (client requests) larger than 100MiB
+        client_max_body_size 100m;
+        # client bodies larger than this are written in a temporary
+        # file and nginx outputs annoying warning
+        client_body_buffer_size 64k;
 
 	location / {
                 # Proxy-Connection must not be passed

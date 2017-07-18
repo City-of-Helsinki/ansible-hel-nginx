@@ -6,6 +6,23 @@ server {
         root /usr/share/nginx/html;
         index index.html index.htm;
 
+	# This defines a 4MiB buffer that is used to
+	# store responses from proxied upstreams while
+        # they are being read by a slow client, thus freeing
+        # the server process to serve another client.
+        # This done here, because it is then generic across all
+        # possible backend servers (uwsgi would be self-cabable, naturally)
+        #
+        # If the buffer is too small nginx will write the buffer
+        # out to file, which is silly.
+        proxy_buffers 1024 4k;
+
+        # blocks uploads (client requests) larger than 100MiB
+        client_max_body_size 100m;
+        # client bodies larger than this are written in a temporary
+        # file and nginx outputs annoying warning
+        client_body_buffer_size 64k;
+
 	location / {
                 # Proxy-Connection must not be passed
                 # through reverse-proxies and is
