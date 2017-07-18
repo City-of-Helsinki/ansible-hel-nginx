@@ -9,7 +9,7 @@ server {
         # Supports Let's Encrypt certificate (re-)issuance process
         # /srv/letsencrypt/challenges only needs to be readable
         # by the web server process
-        location /.well-known/acme-challenge/ {
+        location /.well-known/acme-challenge {
                 alias /srv/letsencrypt/challenges;
                 try_files $uri @forward_https;
         }
