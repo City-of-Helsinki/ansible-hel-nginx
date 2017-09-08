@@ -5,7 +5,7 @@ server {
         # set at default host (same applies to any other listen options)
         listen [::]:{{ nginx_listen_port|default(80) }};
 
-        server_name {{ nginx_virtualhost }};
+        server_name {{ nginx_virtualhosts | join(" ") }};
 
         # Supports Let's Encrypt certificate (re-)issuance process
         # /srv/letsencrypt/challenges only needs to be readable
@@ -59,7 +59,7 @@ server {
 {% include nginx_fragment_file|default("non_existent") ignore missing %}
 
         # HTTP-Host:
-        server_name {{ nginx_virtualhost }};
+        server_name {{ nginx_virtualhosts | join(" ") }};
 
 	# public files that do not directly belong to the application
 	# like accessibility statements or robots.txt

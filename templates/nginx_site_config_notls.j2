@@ -9,7 +9,7 @@ server {
         root /usr/share/nginx/html;
 
         # HTTP-Host:
-        server_name {{nginx_virtualhost}};
+        server_name {{nginx_virtualhosts|join(" ")}};
 
 	{% if nginx_increased_body_size is defined and nginx_increased_body_size%}
         client_max_body_size 100m;
