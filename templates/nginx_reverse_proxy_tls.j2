@@ -70,6 +70,12 @@ server {
         # out to file, which is silly.
         proxy_buffers 1024 4k;
 
+        # This is a complement to proxy_buffers, which defines the size
+        # of buffer used to the the headers sent by upstream
+        # This is normally 4k, but we increase it to 8k as authentication
+        # depends on large cookies (containing AD groups)
+        proxy_buffer_size 8k;
+
         # blocks uploads (client requests) larger than 100MiB
         client_max_body_size 100m;
         # client bodies larger than this are written in a temporary

@@ -10,7 +10,7 @@ server {
         # Supports Let's Encrypt certificate (re-)issuance process
         # /srv/letsencrypt/challenges only needs to be readable
         # by the web server process
-        location /.well-known/acme-challenge/ {
+        location /.well-known/acme-challenge {
                 alias /srv/letsencrypt/challenges;
                 try_files $uri @forward_https;
         }
@@ -60,6 +60,10 @@ server {
 
         # HTTP-Host:
         server_name {{ nginx_virtualhosts | join(" ") }};
+
+        # blocks uploads (client requests) larger than 100MiB
+        # this is actually larger, than nginx default
+        client_max_body_size 100m;
 
 	# public files that do not directly belong to the application
 	# like accessibility statements or robots.txt
