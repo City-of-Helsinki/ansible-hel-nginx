@@ -32,7 +32,7 @@ server {
                 alias /home/{{nginx_site_user}}/media/;
         }
 
-        location {{ "/" ~ nginx_url_prefix if nginx_url_prefix is defined }}/ {
+        location {{ "/" ~ nginx_url_prefix if nginx_url_prefix is defined else "" }}/ {
                 include uwsgi_params;
 {% if nginx_contract_port is defined %}
                 uwsgi_pass 127.0.0.1:{{nginx_contract_port}};
