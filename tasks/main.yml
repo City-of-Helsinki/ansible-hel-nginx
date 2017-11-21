@@ -4,6 +4,14 @@
   with_items:
   - nginx
 
+- name: Enable GZIP for larger variety of content types
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    regexp: '# gzip_types.*;'
+    line: '	gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;'
+  # This sadly does not work
+  when: try_broken_gzip_types
+
 # All TLS-enabled templates need this file
 - name: Create DHE parameter file
   command: openssl dhparam -out /etc/ssl/dhparam.pem 2048
