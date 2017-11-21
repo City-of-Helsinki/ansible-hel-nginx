@@ -10,7 +10,7 @@
     regexp: '# gzip_types.*;'
     line: '	gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;'
   # This sadly does not work
-  when: try_broken_gzip_types
+  when: try_broken_gzip_types|default(False)
 
 # All TLS-enabled templates need this file
 - name: Create DHE parameter file
