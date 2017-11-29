@@ -1,0 +1,5 @@
+{% for alias in nginx_aliases %}
+        location {{ alias.location }} {
+                alias {{ alias.target }};
+        }
+{% endfor %}

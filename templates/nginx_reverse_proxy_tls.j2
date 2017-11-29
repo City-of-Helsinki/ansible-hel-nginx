@@ -4,7 +4,7 @@ server {
         # set at default host (same applies to any other listen options)
         listen [::]:{{ nginx_listen_port }};
 
-        server_name {{ nginx_virtualhost }};
+        server_name {{ nginx_virtualhosts | join(" ") }};
 
         # Supports Let's Encrypt certificate (re-)issuance process
         # /srv/letsencrypt/challenges only needs to be readable
@@ -27,7 +27,7 @@ server {
 server {
         listen {{ nginx_tls_listen_port }} ssl;
 
-        server_name {{ nginx_virtualhost }};
+        server_name {{ nginx_virtualhosts | join(" ") }};
 
         # ssl_certificate is supposed to include any chained certs
         ssl_certificate {{ nginx_certchain|default("non_existent")}};
@@ -81,7 +81,7 @@ server {
         # client bodies larger than this are written in a temporary
         # file and nginx outputs annoying warning
         client_body_buffer_size 64k;
-
+        {% include 'nginx_alias_fragment.j2' %}
 	location / {
                 # Proxy-Connection must not be passed
                 # through reverse-proxies and is
