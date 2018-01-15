@@ -81,8 +81,12 @@ server {
         # client bodies larger than this are written in a temporary
         # file and nginx outputs annoying warning
         client_body_buffer_size 64k;
-        {% include 'nginx_alias_fragment.j2' %}
-	location / {
+
+{% include 'nginx_rewrite_fragment.j2' %}
+{% include 'nginx_alias_fragment.j2' %}
+{% include 'nginx_redirect_fragment.j2' %}
+
+        location / {
                 # Proxy-Connection must not be passed
                 # through reverse-proxies and is
                 # illegal with HTTP/2 to boot

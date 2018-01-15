@@ -1,4 +1,5 @@
 {% for alias in nginx_aliases %}
+        # {{ alias.comment }}
         location {{ alias.location }} {
                 alias {{ alias.target }};
         }
