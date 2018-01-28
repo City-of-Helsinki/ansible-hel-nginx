@@ -1,6 +1,8 @@
+{% if nginx_redirects is defined %}
 {% for redirection in nginx_redirects %}
         # {{ redirection.comment }}
         location {{ redirection.location }} {
                 return 301 {{ redirection.target }};
         }
 {% endfor %}
+{% endif %}

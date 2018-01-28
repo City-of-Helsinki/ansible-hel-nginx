@@ -1,6 +1,8 @@
+{% if nginx_aliases is defined %}
 {% for alias in nginx_aliases %}
         # {{ alias.comment }}
         location {{ alias.location }} {
                 alias {{ alias.target }};
         }
 {% endfor %}
+{% endif %}

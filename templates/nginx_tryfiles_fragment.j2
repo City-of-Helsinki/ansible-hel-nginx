@@ -1,0 +1,4 @@
+        location / {
+		alias /home/{{node_container.user}}/{{node_container.service_public_path|default("service_public")}}/;
+		try_files $uri /{{node_container.contractfile}} =404;
+        }

@@ -1,6 +1,8 @@
+{% if nginx_rewrites is defined %}
 {% for rewrite in nginx_rewrites %}
         # {{ rewrite.comment }}
         location {{ rewrite.location }} {
                 rewrite {{ rewrite.target }};
         }
 {% endfor %}
+{% endif %}
