@@ -1,0 +1,40 @@
+# {{ ansible_managed }}
+# NGINX default_server configuration for Hel AOK
+# Mostly exists to make sure we do not leak information
+# by some other server becoming the default by accident
+server {
+        # A very safe listening configuration, supporting both
+        # non-TLS and TLS on variety of platforms, even those
+        # that do not support dual stack sockets
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        listen 443 default_server ssl;
+        listen [::]:443 default_server ssl;
+
+        # We use the default of "", which matches nothing, thus
+        # we only catch the traffic matching nothing else by
+        # virtue of default_server above
+        # server_name "";
+
+        # We are perfectly happy with some self-signed certs
+        include snippets/snakeoil.conf;
+
+        # Diffie-Hellman parameter for DHE ciphersuites, recommended
+        # 2048 bits
+        ssl_dhparam /etc/ssl/dhparam.pem;
+
+        # intermediate configuration, as per Mozilla configurator
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
+        ssl_prefer_server_ciphers on;
+
+        # Serve that Debian/Ubuntu default root notice
+        root /var/www/html;
+        index index.html index.htm;
+
+        # Used for Let's Encrypt certificate (re-)issuance process
+        location /.well-known/acme-challenge {
+            alias /srv/letsencrypt/challenges;
+        }
+}
