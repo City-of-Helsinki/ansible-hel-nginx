@@ -2,3 +2,10 @@
 # defaults file for nginx
 nginx_listen_port: 80
 nginx_tls_listen_port: 443
+
+nginx_enable_nontls: no
+nginx_enable_tls: yes
+
+nginx_public_directory: public
+
+nginx_modern: no

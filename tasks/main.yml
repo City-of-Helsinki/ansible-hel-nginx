@@ -7,21 +7,20 @@
 - name: Enable GZIP for larger variety of content types
   lineinfile:
     path: /etc/nginx/nginx.conf
-    regexp: '# gzip_types.*;'
+    regexp: '^#? gzip_types.*;'
     line: '	gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;'
   # This sadly does not work
   when: try_broken_gzip_types|default(False)
+
+- name: Overwrite the distribution provided default site config
+  template: src=nginx_default_server_config.j2
+            dest=/etc/nginx/sites-available/default
 
 # All TLS-enabled templates need this file
 - name: Create DHE parameter file
   command: openssl dhparam -out /etc/ssl/dhparam.pem 2048
   args:
     creates: /etc/ssl/dhparam.pem
-
-- name: Copy in site configuration if no TLS
-  template: src=nginx_site_config_notls.j2
-            dest=/etc/nginx/sites-available/{{nginx_sitename}}
-  when: nginx_certchain is not defined and nginx_contract_socket is defined
 
 - name: Ensure certificate archive exists
   become: yes
@@ -39,7 +38,6 @@
     mode: 0700
   when: nginx_certchain is defined
 
-
 - name: Copying certificates to server
   become: yes
   copy: src=private/tls/{{ nginx_canonical_name }}/{{ nginx_canonical_name }}-fullchain.pem
@@ -49,7 +47,7 @@
         directory_mode=0755
         mode=0444
         backup=yes
-  when: nginx_certchain is defined
+  when: nginx_certchain is defined and nginx_enable_tls
 
 - name: Copying new keys to servers
   become: yes
@@ -60,7 +58,7 @@
         directory_mode=0750
         mode=0440
         backup=yes
-  when: nginx_certchain is defined
+  when: nginx_certchain is defined and nginx_enable_tls
 
 - name: Ensure the link to newest certificate exists
   become: yes
@@ -70,19 +68,29 @@
       dest: /etc/letsencrypt/live/{{ nginx_canonical_name }}/fullchain.pem
     - source: /etc/letsencrypt/archive/{{ nginx_canonical_name }}/privkey.pem
       dest: /etc/letsencrypt/live/{{ nginx_canonical_name }}/privkey.pem
-  when: nginx_certchain is defined
+  when: nginx_certchain is defined and nginx_enable_tls
 
-- name: Copy in site configuration if TLS
+- name: Copy in nginx configuration (unified)
+  template: src=nginx_config.j2
+            dest=/etc/nginx/sites-available/{{ nginx_sitename }}
+  when: nginx_modern
+
+- name: Copy in nginx configuration (legacy uwsgi/TLS)
   template: src=nginx_site_config_tls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
   when: nginx_certchain is defined and nginx_contract_socket is defined
 
-- name: Copy in reverse proxy configuration with TLS
+- name: Copy in nginx configuration (legacy uwsgi/plain)
+  template: src=nginx_site_config_notls.j2
+            dest=/etc/nginx/sites-available/{{nginx_sitename}}
+  when: nginx_certchain is not defined and nginx_contract_socket is defined
+
+- name: Copy in nginx configuration (legacy reverse proxy/TLS)
   template: src=nginx_reverse_proxy_tls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
   when: nginx_certchain is defined and nginx_reverse_host is defined
 
-- name: Copy in reverse proxy configuration without TLS
+- name: Copy in nginx configuration (legacy reverse proxy/plain)
   template: src=nginx_reverse_proxy_notls.j2
             dest=/etc/nginx/sites-available/{{nginx_sitename}}
   when: not nginx_certchain is defined and nginx_reverse_host is defined
@@ -92,5 +100,5 @@
         path=/etc/nginx/sites-enabled/{{nginx_sitename}}
         src=/etc/nginx/sites-available/{{nginx_sitename}}
 
-- name: Restart nginx
+- name: Reload nginx
   service: name=nginx state=reloaded

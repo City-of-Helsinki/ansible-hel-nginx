@@ -1,4 +1,9 @@
-        location / {
-		alias /home/{{node_container.user}}/{{node_container.service_public_path|default("service_public")}}/;
-		try_files $uri /{{node_container.contractfile}} =404;
+{% if nginx_tryfiles is defined %}
+{% for tryfile in nginx_tryfiles %}
+	# {{ tryfile.comment }}
+        location {{ nginx_url_prefix }}/{{ tryfile.url|default("") }} {
+		alias /home/{{ nginx_site_user }}/{{ tryfile.path }};
+		try_files $uri /{{ tryfile.file }} =404;
         }
+{% endfor %}
+{% endif %}
