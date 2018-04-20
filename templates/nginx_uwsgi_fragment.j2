@@ -3,14 +3,14 @@
         # {{ uwsgi.comment }}
         location {{ nginx_url_prefix }}/{{ uwsgi.url|default("") }} {
             include uwsgi_params;
-            {% if nginx_service_host is defined %}
+{% if nginx_service_host is defined %}
             uwsgi_param HTTP_HOST {{ nginx_service_host }};
-            {% endif %}
-            {% if uwsgi.port is defined %}
+{% endif %}
+{% if uwsgi.port is defined %}
             uwsgi_pass 127.0.0.1:{{ uwsgi.port }};
-            {% elif uwsgi.socket is defined %}
+{% elif uwsgi.socket is defined %}
             uwsgi_pass unix://{{ uwsgi.socket }};
-            {% endif -%}
+{% endif %}
         }
 {% endfor %}
 {% endif %}

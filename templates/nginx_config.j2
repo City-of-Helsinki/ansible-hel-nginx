@@ -68,6 +68,9 @@ server {
 
         # HTTP-Host:
         server_name {{ nginx_virtualhosts | join(" ") }};
+{% if nginx_access_log_directory is defined %}
+        access_log /var/log/nginx/{{ nginx_access_log_directory }}/access.log
+{% endif %}
 
         # blocks uploads (client requests) larger than 100MiB
         # this is actually larger than the nginx default
@@ -84,8 +87,8 @@ server {
         # out to file, which is silly.
         proxy_buffers 1024 4k;
 
-        # This is a complement to proxy_buffers, which defines the size
-        # of buffer used to the the headers sent by upstream
+        # This is a complement to proxy_buffers, that defines the size
+        # of buffer used for the the headers sent by upstream
         # This is normally 4k, but we increase it to 8k as our services
         # tend to generate unreasonably large cookies. 8k will always
         # Fit a 4k cookie, which is the maximum for most browsers.
