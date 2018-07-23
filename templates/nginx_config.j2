@@ -1,10 +1,11 @@
+# {{ ansible_managed }}
 {# Oft repeated variables #}
 {% set nginx_url_prefix = "/" ~ nginx_url_prefix if nginx_url_prefix is defined else "" %}
 {% if nginx_redirect_to_encrypted|default(True) and nginx_enable_tls %}
 server {
         listen {{ nginx_listen_port|default(80) }};
         # This is tricksy, examples show ipv6only=no, but that must only be
-        # set once for address:port pair, typically  at the "default" server
+        # set once for address:port pair, typically at the "default" server
         listen [::]:{{ nginx_listen_port|default(80) }};
 
         server_name {{ nginx_virtualhosts | join(" ") }};
