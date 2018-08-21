@@ -1,19 +1,19 @@
 {% if nginx_proxies is defined %}
 {% for proxy in nginx_proxies %}
-    # {{ proxy.comment }}
-    location {{ nginx_url_prefix }}/{{ proxy.url|default("") }} {
-        # Proxy-Connection must not be passed
-        # through reverse-proxies and is
-        # illegal with HTTP/2 to boot
-        # Safari will by Very Unhappy if you do it
-        proxy_hide_header Proxy-Connection;
-        # Disables rewriting Location and Refresh -headers
-        proxy_redirect off;
-        # Timeout for TCP connection establishment
-        proxy_connect_timeout 10;
-        # Timeout between successive reads from socket
-        proxy_read_timeout 30;
-        proxy_pass http://{{ proxy.host }}:{{ proxy.port }};
-    }
+	# {{ proxy.comment }}
+        location {{ nginx_url_prefix }}/{{ proxy.url|default("") }} {
+            # Proxy-Connection must not be passed
+            # through reverse-proxies and is
+            # illegal with HTTP/2 to boot
+            # Safari will by Very Unhappy if you do it
+            proxy_hide_header Proxy-Connection;
+            # Disables rewriting Location and Refresh -headers
+            proxy_redirect off;
+            # Timeout for TCP connection establishment
+            proxy_connect_timeout 10;
+            # Timeout between successive reads from socket
+            proxy_read_timeout 30;
+            proxy_pass http://{{ proxy.host }}:{{ proxy.port }};
+        }
 {% endfor %}
 {% endif %}
