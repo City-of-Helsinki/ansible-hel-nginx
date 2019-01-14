@@ -2,6 +2,7 @@
 {% for proxy in nginx_proxies %}
 	# {{ proxy.comment }}
         location {{ nginx_url_prefix }}/{{ proxy.url|default("") }} {
+            include proxy_params;
             # Proxy-Connection must not be passed
             # through reverse-proxies and is
             # illegal with HTTP/2 to boot
