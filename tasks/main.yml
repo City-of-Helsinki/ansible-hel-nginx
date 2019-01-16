@@ -29,6 +29,7 @@
     state: directory
     mode: 0700
   when: nginx_certchain is defined
+  tags: certificates
 
 - name: Ensure certificate liveliness exists
   become: yes
@@ -37,6 +38,7 @@
     state: directory
     mode: 0700
   when: nginx_certchain is defined
+  tags: certificates
 
 - name: Copying certificates to server
   become: yes
@@ -48,6 +50,7 @@
         mode=0444
         backup=yes
   when: nginx_certchain is defined and nginx_enable_tls
+  tags: certificates
 
 - name: Copying new keys to servers
   become: yes
@@ -59,6 +62,7 @@
         mode=0440
         backup=yes
   when: nginx_certchain is defined and nginx_enable_tls
+  tags: certificates
 
 - name: Ensure the link to newest certificate exists
   become: yes
@@ -69,6 +73,7 @@
     - source: /etc/letsencrypt/archive/{{ nginx_canonical_name }}/privkey.pem
       dest: /etc/letsencrypt/live/{{ nginx_canonical_name }}/privkey.pem
   when: nginx_certchain is defined and nginx_enable_tls
+  tags: certificates
 
 - name: Copy in nginx configuration (unified)
   template: src=nginx_config.j2
