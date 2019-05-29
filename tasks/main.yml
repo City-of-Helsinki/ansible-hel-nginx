@@ -1,8 +1,12 @@
 ---
 - name: Install nginx
-  package: name={{item}} state=present
-  with_items:
-  - nginx
+  apt: name={{ packages }} state=present
+  environment:
+    RUNLEVEL: 1
+  vars:
+    packages:
+      - ssl-cert
+      - nginx
 
 - name: Enable GZIP for larger variety of content types
   lineinfile:
@@ -49,7 +53,7 @@
         directory_mode=0755
         mode=0444
         backup=yes
-  when: nginx_certchain is defined and nginx_enable_tls
+  when: nginx_certchain is defined
   tags: certificates
 
 - name: Copying new keys to servers
@@ -61,7 +65,7 @@
         directory_mode=0750
         mode=0440
         backup=yes
-  when: nginx_certchain is defined and nginx_enable_tls
+  when: nginx_certchain is defined
   tags: certificates
 
 - name: Ensure the link to newest certificate exists
@@ -72,7 +76,7 @@
       dest: /etc/letsencrypt/live/{{ nginx_canonical_name }}/fullchain.pem
     - source: /etc/letsencrypt/archive/{{ nginx_canonical_name }}/privkey.pem
       dest: /etc/letsencrypt/live/{{ nginx_canonical_name }}/privkey.pem
-  when: nginx_certchain is defined and nginx_enable_tls
+  when: nginx_certchain is defined
   tags: certificates
 
 - name: Copy in nginx configuration (unified)

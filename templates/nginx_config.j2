@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 {# Oft repeated variables #}
-{% set nginx_url_prefix = "/" ~ nginx_url_prefix if nginx_url_prefix is defined else "" %}
-{% if nginx_redirect_to_encrypted|default(True) and nginx_enable_tls %}
+{% set nginx_url_prefix = "/" ~ nginx_url_prefix if nginx_url_prefix|length != 0 else "" %}
+{% if nginx_redirect_to_encrypted %}
 server {
         listen {{ nginx_listen_port|default(80) }};
         # This is tricksy, examples show ipv6only=no, but that must only be
@@ -28,6 +28,7 @@ server {
         }
 }
 {% endif %}
+{% if nginx_local_server %}
 server {
 {% if nginx_enable_nontls or not nginx_enable_tls %}
         listen {{ nginx_nontls_listen_port|default(80) }};
@@ -62,10 +63,8 @@ server {
         # it would be a PITA to configure this per datacenter
         resolver 8.8.8.8;
 {% endif %}
-        root /home/{{ nginx_site_user }}/{{ nginx_public_directory }};
-        index index.html index.htm;
-{# emergency hatch, when something very exotic is needed #}
-{% include nginx_additional_config_file|default("non_existent") ignore missing %}
+        root {{ nginx_root }};
+        index {{ nginx_index }};
 
         # HTTP-Host:
         server_name {{ nginx_virtualhosts | join(" ") }};
@@ -118,8 +117,11 @@ server {
 {% include 'nginx_uwsgi_fragment.j2' %}
 {% include 'nginx_proxy_fragment.j2' %}
 {% include 'nginx_tryfiles_fragment.j2' %}
+{# emergency hatch, when something very exotic is needed #}
+{% include nginx_additional_config_file|default("non_existent") ignore missing %}
         # Used for Let's Encrypt certificate (re-)issuance process
         location /.well-known/acme-challenge {
             alias /srv/letsencrypt/challenges;
         }
 }
+{% endif %}

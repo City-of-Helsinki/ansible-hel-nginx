@@ -3,9 +3,21 @@
 nginx_listen_port: 80
 nginx_tls_listen_port: 443
 
-nginx_enable_nontls: no
-nginx_enable_tls: yes
+nginx_enable_nontls: yes
+nginx_enable_tls: no
 
 nginx_public_directory: public
 
 nginx_modern: no
+
+# Redirect all connections to HTTPS
+# HTTP must be off if this is enabled
+nginx_redirect_to_encrypted: no
+# Enable local server functionality. Only HTTPS
+# redirection is enabled if this is no
+nginx_local_server: yes
+
+nginx_url_prefix: ""
+
+nginx_root: /home/{{ nginx_site_user }}/{{ nginx_public_directory }}
+nginx_index: index.html index.htm

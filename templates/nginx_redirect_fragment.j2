@@ -2,7 +2,7 @@
 {% for redirection in nginx_redirects %}
         # {{ redirection.comment }}
         location {{ redirection.location }} {
-                return 301 {{ redirection.target }};
+                return {{ redirection.code|default(301) }} {{ redirection.target }};
         }
 {% endfor %}
 {% endif %}
