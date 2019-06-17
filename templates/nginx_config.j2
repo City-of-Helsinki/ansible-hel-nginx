@@ -89,10 +89,11 @@ server {
 
         # This is a complement to proxy_buffers, that defines the size
         # of buffer used for the the headers sent by upstream
-        # This is normally 4k, but we increase it to 8k as our services
-        # tend to generate unreasonably large cookies. 8k will always
-        # Fit a 4k cookie, which is the maximum for most browsers.
-        proxy_buffer_size 8k;
+        # This is normally 4k, but we increase it to 16k as our services
+        # tend to generate unreasonably large cookies and other types of
+	# headers. 16k will always two large cookies + possible auth
+	# header responses.
+        proxy_buffer_size 16k;
 
 {% if nginx_shortcut_django_aliases|default(False) %}
 	# public files that do not directly belong to the application
