@@ -4,6 +4,9 @@
         location {{ nginx_url_prefix }}/{{ tryfile.url|default("") }} {
 		alias /home/{{ nginx_site_user }}/{{ tryfile.path }};
 		try_files $uri /{{ tryfile.file }} =404;
+{% if tryfile.expires is defined %}
+		expires {{ tryfile.expires }};
+{% endif %}
         }
 {% endfor %}
 {% endif %}
