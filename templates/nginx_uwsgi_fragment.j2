@@ -8,6 +8,10 @@
 {% if nginx_service_host is defined %}
             uwsgi_param HTTP_HOST {{ nginx_service_host }};
 {% endif %}
+{% if uwsgi.reroot_variable is defined %}
+	    rewrite {{ nginx_url_prefix }}/{{ uwsgi.url|default("") }}(.*) /$1 break;
+            uwsgi_param SCRIPT_NAME {{ uwsgi.reroot_variable }};
+{% endif %}
 {% if uwsgi.port is defined %}
             uwsgi_pass 127.0.0.1:{{ uwsgi.port }};
 {% elif uwsgi.socket is defined %}
